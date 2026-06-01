@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Tracker 🍎</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'HS굴토끼체';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2205@1.0/HSGulTokkiL.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background-color: #bcd594;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(10px);
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .nav-logo {
+      font-family: 'HS굴토끼체', 'Jua', sans-serif;
+      font-size: 20px;
+      color: #3a6b35;
+      letter-spacing: 0.5px;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: #deeec8;
+      border-radius: 20px;
+      padding: 4px;
+    }
+    .nav-tab {
+      padding: 7px 20px;
+      border: none;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: #666;
+      transition: all 0.2s;
+    }
+    .nav-tab.active {
+      background: #fff;
+      color: #3a6b35;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    /* ── PAGES ── */
+    .page { display: none; padding: 24px 16px; }
+    .page.active { display: block; }
+
+    .container {
+      max-width: 1060px;
+      margin: 0 auto;
+      background: #fefbf0;
+      padding: 28px 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    }
+
+    .page-title {
+      font-family: 'HS굴토끼체', 'Jua', sans-serif;
+      text-align: center;
+      font-size: 28px;
+      color: #3a6b35;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+
+    /* ── TODAY DATE BADGE ── */
+    .today-badge {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .today-badge span {
+      display: inline-block;
+      background: #d4edbc;
+      color: #3a6b35;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 5px 16px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── SETTINGS ── */
+    .settings {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: #dff0d8;
+      border: 1px solid #c3e0b8;
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+    }
+    .settings-label {
+      font-size: 13px;
+      color: #555;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .settings-label input[type="number"] {
+      width: 62px;
+      padding: 5px 8px;
+      border: 1px solid #c8dfc0;
+      border-radius: 6px;
+      font-size: 13px;
+      text-align: center;
+      background: #f6faf2;
+    }
+    .settings-label input[type="number"]:focus {
+      outline: none;
+      border-color: #8dc07a;
+    }
+    .spacer { flex: 1; }
+    .settings-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      padding: 7px 15px;
+      border: none;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-apply { background: #757575; color: #fff; }
+    .btn-apply:hover { background: #616161; }
+    .btn-add   { background: #43a047; color: #fff; }
+    .btn-add:hover   { background: #388e3c; }
+    .btn-print { background: #1e88e5; color: #fff; }
+    .btn-print:hover { background: #1565c0; }
+    .btn-reset { background: #ef5350; color: #fff; }
+    .btn-reset:hover { background: #c62828; }
+
+    /* ── TABLE ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+    }
+    th {
+      background: #cce8c0;
+      padding: 10px 8px;
+      border: 1px solid #c0d8b4;
+      font-size: 13px;
+      color: #444;
+      text-align: center;
+      font-weight: 600;
+    }
+    td {
+      border: 1px solid #d8d0b8;
+      padding: 6px;
+      vertical-align: middle;
+    }
+    .td-song { width: 150px; }
+    .td-del  { width: 32px; text-align: center; padding: 4px; }
+
+    .cell-input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      color: #333;
+      text-align: center;
+      padding: 3px 4px;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+    .cell-input::placeholder { color: #bbb; }
+    .cell-input:focus { background: #fffde7; }
+
+    /* ── APPLES ── */
+    .apples-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      padding: 4px 2px;
+    }
+    .apple-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 1px;
+      border-radius: 4px;
+      line-height: 0;
+      transition: transform 0.12s;
+    }
+    .apple-btn:hover  { transform: scale(1.18); }
+    .apple-btn:active { transform: scale(0.92); }
+    .apple-btn svg { width: 26px; height: 30px; display: block; }
+
+    .del-btn {
+      background: none; border: none;
+      color: #ccc; font-size: 14px;
+      cursor: pointer; padding: 3px 5px;
+      border-radius: 4px; transition: all 0.15s;
+    }
+    .del-btn:hover { color: #e53935; background: #ffeaea; }
+
+    .add-row-btn {
+      display: block; width: 100%;
+      padding: 11px;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      background: transparent;
+      color: #999; font-size: 14px;
+      cursor: pointer; transition: all 0.2s;
+      margin-bottom: 24px;
+    }
+    .add-row-btn:hover {
+      border-color: #43a047; color: #43a047; background: #f1f8e9;
+    }
+
+    /* ── DONE BUTTON ── */
+    .done-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding-top: 4px;
+    }
+    .btn-done {
+      background: linear-gradient(135deg, #e53935, #c62828);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      padding: 14px 48px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(229,57,53,0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.5px;
+    }
+    .btn-done:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 22px rgba(229,57,53,0.45);
+    }
+    .btn-done:active { transform: translateY(0); }
+    .done-hint {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    /* ── APPLE POP ── */
+    @keyframes pop {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.35); }
+      70%  { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+    .apple-pop { animation: pop 0.22s ease; }
+
+    /* ── DONE MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(30,20,10,0.48);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.26s;
+    }
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal-box {
+      background: #fff8ee;
+      border-radius: 26px;
+      padding: 36px 40px 32px;
+      max-width: 440px;
+      width: 92%;
+      text-align: center;
+      box-shadow: 0 16px 56px rgba(180,60,40,0.18), 0 4px 16px rgba(0,0,0,0.1);
+      border: 2.5px solid #f5c8a0;
+      transform: scale(0.82) translateY(24px);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .modal-overlay.show .modal-box { transform: scale(1) translateY(0); }
+
+    .modal-apple-icon {
+      font-size: 44px;
+      line-height: 1;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .modal-title {
+      font-family: 'HS굴토끼체', 'Jua', sans-serif;
+      font-size: 24px;
+      color: #c62828;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+    .modal-date {
+      font-size: 13px;
+      color: #b8a898;
+      margin-bottom: 24px;
+    }
+
+    /* ring */
+    .ring-wrap {
+      position: relative;
+      width: 148px; height: 148px;
+      margin: 0 auto 24px;
+    }
+    .ring-wrap svg { transform: rotate(-90deg); }
+    .ring-bg   { fill: none; stroke: #f0e4d0; stroke-width: 13; }
+    .ring-fill {
+      fill: none;
+      stroke: #e53935;
+      stroke-width: 13;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1.1s cubic-bezier(0.4,0,0.2,1);
+    }
+    .ring-text {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .ring-pct {
+      font-size: 36px; font-weight: 800;
+      color: #c62828; line-height: 1;
+    }
+    .ring-label { font-size: 12px; color: #c0a888; margin-top: 3px; }
+
+    /* per-song bars */
+    .song-list { text-align: left; margin-bottom: 26px; }
+    .song-item { margin-bottom: 11px; }
+    .song-name {
+      font-size: 13px; color: #664444;
+      display: flex; justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    .song-bar-bg {
+      height: 8px; background: #f0e4d0;
+      border-radius: 99px; overflow: hidden;
+    }
+    .song-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #e53935, #ff7043);
+      border-radius: 99px;
+      transition: width 0.95s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .modal-confirm-btn {
+      background: linear-gradient(135deg, #e53935, #c62828);
+      color: #fff;
+      border: none;
+      border-radius: 22px;
+      padding: 12px 48px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(198,40,40,0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .modal-confirm-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 18px rgba(198,40,40,0.4);
+    }
+
+    /* ── HISTORY PAGE ── */
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 30px;
+    }
+    @media (max-width: 680px) {
+      .stats-cards { grid-template-columns: repeat(2, 1fr); }
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px 16px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid #e0eed4;
+    }
+    .stat-value {
+      font-size: 30px;
+      font-weight: 800;
+      color: #3a6b35;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-label { font-size: 12px; color: #aaa; }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #555;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e8eedc;
+    }
+
+    .session-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .session-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      border: 1px solid #e0eed4;
+      cursor: pointer;
+      transition: box-shadow 0.15s, transform 0.15s;
+    }
+    .session-card:hover {
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
+    }
+    .session-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .session-date { font-size: 14px; font-weight: 700; color: #333; }
+    .session-pct  { font-size: 15px; font-weight: 800; color: #e53935; }
+    .session-count { font-size: 12px; color: #aaa; margin-top: 2px; }
+    .session-songs { font-size: 12px; color: #999; margin-bottom: 10px; }
+    .session-bar-bg {
+      height: 7px; background: #eee;
+      border-radius: 99px; overflow: hidden;
+    }
+    .session-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #e53935, #ff7043);
+      border-radius: 99px;
+    }
+
+    .session-detail {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f0ecd8;
+    }
+    .session-detail.open { display: block; }
+    .detail-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    .detail-song { color: #555; min-width: 100px; }
+    .detail-bar-wrap { flex: 1; margin: 0 12px; }
+    .detail-bar-bg {
+      height: 6px; background: #eee;
+      border-radius: 99px; overflow: hidden;
+    }
+    .detail-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #e53935, #ff7043);
+      border-radius: 99px;
+    }
+    .detail-pct { color: #e53935; font-weight: 700; min-width: 40px; text-align: right; }
+
+    .empty-history {
+      text-align: center;
+      color: #c0baa0;
+      padding: 60px 20px;
+      font-size: 15px;
+      line-height: 2.2;
+    }
+
+    /* ══════════════════════════════
+       RESPONSIVE — TABLET (≤ 768px)
+    ══════════════════════════════ */
+    @media (max-width: 768px) {
+      .page { padding: 16px 12px; }
+      .container { padding: 22px 18px; }
+      .nav-tab { padding: 7px 14px; }
+      .stats-cards { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ══════════════════════════════
+       RESPONSIVE — MOBILE (≤ 600px)
+    ══════════════════════════════ */
+    @media (max-width: 600px) {
+      /* nav */
+      nav { padding: 10px 14px; }
+      .nav-logo { font-size: 16px; }
+      .nav-tab  { padding: 6px 11px; font-size: 12px; }
+
+      /* page & container */
+      .page      { padding: 12px 8px; }
+      .container { padding: 16px 12px; border-radius: 12px; }
+      .page-title { font-size: 22px; margin-bottom: 6px; }
+
+      /* settings bar — wrap naturally, hide spacer */
+      .settings { gap: 8px; padding: 10px 12px; }
+      .spacer   { display: none; }
+      .btn-print { display: none !important; }   /* 인쇄는 모바일에서 숨김 */
+      .btn      { padding: 7px 12px; font-size: 12px; }
+      .settings-label { font-size: 12px; }
+      .settings-label input[type="number"] { width: 52px; font-size: 12px; }
+
+      /* table */
+      th, td    { padding: 5px 4px; }
+      th        { font-size: 12px; }
+      .td-song  { width: 80px; }
+      .td-del   { width: 26px; }
+      .cell-input { font-size: 12px; }
+
+      /* apples — smaller on mobile */
+      .apples-wrap { gap: 2px; padding: 3px 1px; }
+      .apple-btn svg { width: 21px; height: 24px; }
+
+      /* done button */
+      .btn-done { padding: 12px 36px; font-size: 15px; }
+      .done-hint { font-size: 11px; }
+
+      /* modal */
+      .modal-box {
+        padding: 24px 20px 22px;
+        border-radius: 20px;
+      }
+      .modal-apple-icon { font-size: 36px; }
+      .modal-title      { font-size: 20px; }
+      .modal-date       { font-size: 12px; margin-bottom: 18px; }
+      .ring-wrap        { width: 120px; height: 120px; margin-bottom: 18px; }
+      .ring-wrap svg    { width: 120px; height: 120px; }
+      .ring-pct         { font-size: 28px; }
+      .song-list        { margin-bottom: 20px; }
+      .song-name        { font-size: 12px; }
+      .modal-confirm-btn { padding: 11px 36px; font-size: 14px; }
+
+      /* history */
+      .stat-card   { padding: 14px 10px; border-radius: 12px; }
+      .stat-value  { font-size: 24px; }
+      .session-card { padding: 13px 14px; }
+      .session-date { font-size: 13px; }
+      .section-title { font-size: 14px; }
+    }
+
+    /* ══════════════════════════════
+       RESPONSIVE — SMALL (≤ 380px)
+    ══════════════════════════════ */
+    @media (max-width: 380px) {
+      .nav-logo { font-size: 14px; }
+      .nav-tab  { padding: 5px 9px; font-size: 11px; }
+      .page-title { font-size: 19px; }
+      .apple-btn svg { width: 18px; height: 21px; }
+      .td-song { width: 68px; }
+      .stats-cards { gap: 8px; }
+      .stat-value { font-size: 20px; }
+    }
+
+    /* ── PRINT ── */
+    @media print {
+      body { background: #fff; }
+      nav, .settings, .add-row-btn, .del-btn, .td-del, .done-area { display: none !important; }
+      .container { box-shadow: none; border-radius: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">🍎 Apple Tracker</span>
+  <div class="nav-tabs">
+    <button class="nav-tab active" id="tab-main"    onclick="showPage('main')">오늘 연습</button>
+    <button class="nav-tab"        id="tab-history" onclick="showPage('history')">기록 &amp; 통계</button>
+  </div>
+</nav>
+
+<!-- ════════ MAIN PAGE ════════ -->
+<div id="page-main" class="page active">
+  <div class="container">
+    <h1 class="page-title">Apple Tracker 🍎</h1>
+
+    <div class="today-badge">
+      <span id="todayBadge"></span>
+    </div>
+
+    <div class="settings">
+      <span class="settings-label">
+        과일 개수
+        <input type="number" id="appleCountInput" value="10" min="5" max="40">
+      </span>
+      <button class="btn btn-apply" onclick="applyAppleCount()">적용</button>
+      <div class="spacer"></div>
+      <div class="settings-btns">
+        <button class="btn btn-add"   onclick="addRow()">＋ 행 추가</button>
+        <button class="btn btn-print" onclick="window.print()">🖨 인쇄</button>
+        <button class="btn btn-reset" onclick="resetToday()">초기화</button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:150px">과제곡</th>
+          <th>연습횟수</th>
+          <th style="width:32px"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+
+    <button class="add-row-btn" onclick="addRow()">＋ 행 추가</button>
+
+    <div class="done-area">
+      <button class="btn-done" onclick="openDoneModal()">🍎 Done</button>
+      <span class="done-hint">오늘 자정 전까지 수정할 수 있어요</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ HISTORY PAGE ════════ -->
+<div id="page-history" class="page">
+  <div class="container">
+    <h1 class="page-title">📊 연습 기록</h1>
+    <div class="stats-cards"  id="statsCards"></div>
+    <div class="section-title">날짜별 기록</div>
+    <div class="session-list" id="sessionList"></div>
+  </div>
+</div>
+
+<!-- ════════ DONE MODAL ════════ -->
+<div class="modal-overlay" id="doneModal">
+  <div class="modal-box">
+    <span class="modal-apple-icon">🍎</span>
+    <div class="modal-title">Practice Complete</div>
+    <div class="modal-date" id="modalDate"></div>
+
+    <div class="ring-wrap">
+      <svg width="100%" height="100%" viewBox="0 0 148 148">
+        <circle class="ring-bg"   cx="74" cy="74" r="61"/>
+        <circle class="ring-fill" id="ringFill" cx="74" cy="74" r="61"
+          stroke-dasharray="383.3" stroke-dashoffset="383.3"/>
+      </svg>
+      <div class="ring-text">
+        <div class="ring-pct"   id="ringPct">0%</div>
+        <div class="ring-label">달성률</div>
+      </div>
+    </div>
+
+    <div class="song-list" id="modalSongList"></div>
+
+    <button class="modal-confirm-btn" onclick="confirmDone()">확인</button>
+  </div>
+</div>
+
+<script>
+  /* ══ HELPERS ══ */
+  function getTodayKey() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function formatDateKo(dateStr) {
+    const [y, m, d] = dateStr.split('-');
+    const dow = ['일','월','화','수','목','금','토'][new Date(dateStr).getDay()];
+    return `${y}년 ${parseInt(m)}월 ${parseInt(d)}일 (${dow})`;
+  }
+
+  /* ══ STATE ══ */
+  let appleCount = 10;
+  let rows       = [];
+  let nextId     = 1;
+  let sessions   = [];
+
+  /* ══ NAV ══ */
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`page-${name}`).classList.add('active');
+    document.getElementById(`tab-${name}`).classList.add('active');
+    if (name === 'history') renderHistory();
+  }
+
+  /* ══ APPLE SVG ══ */
+  function svgOutline() {
+    return `<svg viewBox="0 0 40 46" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 7 Q23 2 27 4" stroke="#bbb" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M19 9 Q26 3 30 9 Q26 15 19 9Z" fill="#d5ead6" stroke="#b0ccb1" stroke-width="0.8"/>
+      <path d="M13 14 C6 14 3 21 3 27 C3 38 10 43 17 43 C19 43 21 41 21 41
+               C21 41 23 43 25 43 C32 43 37 38 37 27 C37 21 34 14 27 14
+               C25 14 23 16 21 16 C19 16 17 14 13 14Z"
+            fill="none" stroke="#bbb" stroke-width="1.6"/>
+    </svg>`;
+  }
+  function svgFilled() {
+    return `<svg viewBox="0 0 40 46" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 7 Q23 2 27 4" stroke="#795548" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M19 9 Q26 3 30 9 Q26 15 19 9Z" fill="#66bb6a" stroke="#388e3c" stroke-width="0.8"/>
+      <path d="M13 14 C6 14 3 21 3 27 C3 38 10 43 17 43 C19 43 21 41 21 41
+               C21 41 23 43 25 43 C32 43 37 38 37 27 C37 21 34 14 27 14
+               C25 14 23 16 21 16 C19 16 17 14 13 14Z"
+            fill="#e53935" stroke="#b71c1c" stroke-width="1"/>
+      <ellipse cx="12" cy="22" rx="3" ry="5" fill="rgba(255,255,255,0.28)" transform="rotate(-20 12 22)"/>
+    </svg>`;
+  }
+
+  /* ══ RENDER ROW ══ */
+  function renderRow(row) {
+    const tbody = document.getElementById('tbody');
+    const tr = document.createElement('tr');
+    tr.id = `row-${row.id}`;
+
+    const tdSong = document.createElement('td');
+    tdSong.className = 'td-song';
+    const songIn = document.createElement('input');
+    songIn.className = 'cell-input'; songIn.placeholder = '곡명 입력';
+    songIn.value = row.song;
+    songIn.oninput = () => { row.song = songIn.value; saveMain(); };
+    tdSong.appendChild(songIn);
+
+    const tdApples = document.createElement('td');
+    const grid = document.createElement('div');
+    grid.className = 'apples-wrap'; grid.id = `apples-${row.id}`;
+    buildApples(grid, row);
+    tdApples.appendChild(grid);
+
+    const tdDel = document.createElement('td');
+    tdDel.className = 'td-del';
+    const delBtn = document.createElement('button');
+    delBtn.className = 'del-btn'; delBtn.innerHTML = '✕';
+    delBtn.onclick = () => deleteRow(row.id);
+    tdDel.appendChild(delBtn);
+
+    tr.append(tdSong, tdApples, tdDel);
+    tbody.appendChild(tr);
+  }
+
+  function buildApples(grid, row) {
+    grid.innerHTML = '';
+    for (let i = 0; i < row.appleCount; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'apple-btn';
+      btn.innerHTML = i < row.filled ? svgFilled() : svgOutline();
+      btn.onclick = () => toggleApple(row, i, grid, btn);
+      grid.appendChild(btn);
+    }
+  }
+
+  /* ══ SOUND + TOGGLE ══ */
+  let audioCtx = null;
+  function playAppleSound(filling) {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    const now = audioCtx.currentTime;
+    if (filling) {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520, now);
+      osc.frequency.exponentialRampToValueAtTime(520, now + 0.08);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      osc.start(now); osc.stop(now + 0.18);
+    } else {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(380, now);
+      osc.frequency.exponentialRampToValueAtTime(220, now + 0.1);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.start(now); osc.stop(now + 0.15);
+    }
+  }
+
+  function toggleApple(row, index, grid, btn) {
+    const wasFilled = index < row.filled;
+    row.filled = wasFilled ? index : index + 1;
+    playAppleSound(!wasFilled);
+    btn.classList.add('apple-pop');
+    btn.addEventListener('animationend', () => btn.classList.remove('apple-pop'), { once: true });
+    buildApples(grid, row);
+    saveMain();
+  }
+
+  /* ══ ROW MANAGEMENT ══ */
+  function addRow() {
+    const row = { id: nextId++, song: '', filled: 0, appleCount };
+    rows.push(row);
+    renderRow(row);
+    saveMain();
+  }
+
+  function deleteRow(id) {
+    rows = rows.filter(r => r.id !== id);
+    document.getElementById(`row-${id}`)?.remove();
+    saveMain();
+  }
+
+  function applyAppleCount() {
+    const val = parseInt(document.getElementById('appleCountInput').value);
+    if (isNaN(val) || val < 1) return;
+    appleCount = val;
+    rows.forEach(row => {
+      row.appleCount = appleCount;
+      if (row.filled > appleCount) row.filled = appleCount;
+      const grid = document.getElementById(`apples-${row.id}`);
+      if (grid) buildApples(grid, row);
+    });
+    saveMain();
+  }
+
+  function resetToday() {
+    rows = []; nextId = 1;
+    document.getElementById('tbody').innerHTML = '';
+    saveMain();
+    for (let i = 0; i < 5; i++) addRow();
+  }
+
+  /* ══ DONE MODAL ══ */
+  function openDoneModal() {
+    const totalApples  = rows.reduce((s, r) => s + r.appleCount, 0);
+    const filledApples = rows.reduce((s, r) => s + r.filled,     0);
+    const pct = totalApples > 0 ? Math.round(filledApples / totalApples * 100) : 0;
+
+    document.getElementById('modalDate').textContent = formatDateKo(getTodayKey());
+
+    const C = 2 * Math.PI * 61;
+    const ring = document.getElementById('ringFill');
+    ring.style.strokeDasharray  = C;
+    ring.style.strokeDashoffset = C;
+    document.getElementById('ringPct').textContent = `${pct}%`;
+    setTimeout(() => { ring.style.strokeDashoffset = C * (1 - pct / 100); }, 80);
+
+    const songList = document.getElementById('modalSongList');
+    songList.innerHTML = '';
+    rows.filter(r => r.song || r.filled > 0).forEach(r => {
+      const rPct = r.appleCount > 0 ? Math.round(r.filled / r.appleCount * 100) : 0;
+      const item = document.createElement('div');
+      item.className = 'song-item';
+      item.innerHTML = `
+        <div class="song-name">
+          <span>${r.song || '(무제)'}</span>
+          <span>${r.filled} / ${r.appleCount} (${rPct}%)</span>
+        </div>
+        <div class="song-bar-bg">
+          <div class="song-bar-fill" style="width:0%" data-w="${rPct}"></div>
+        </div>`;
+      songList.appendChild(item);
+    });
+    setTimeout(() => {
+      songList.querySelectorAll('.song-bar-fill').forEach(el => {
+        el.style.width = el.dataset.w + '%';
+      });
+    }, 140);
+
+    document.getElementById('doneModal').classList.add('show');
+  }
+
+  function confirmDone() {
+    const dateKey = getTodayKey();
+    const totalApples  = rows.reduce((s, r) => s + r.appleCount, 0);
+    const filledApples = rows.reduce((s, r) => s + r.filled,     0);
+    const pct = totalApples > 0 ? Math.round(filledApples / totalApples * 100) : 0;
+
+    sessions = sessions.filter(s => s.date !== dateKey);
+    sessions.unshift({
+      date: dateKey,
+      rows: rows.map(r => ({ song: r.song, filled: r.filled, appleCount: r.appleCount })),
+      totalFilled: filledApples,
+      totalApples,
+      pct,
+      savedAt: Date.now()
+    });
+    saveSessions();
+
+    document.getElementById('doneModal').classList.remove('show');
+    /* 테이블은 유지 — 오늘 자정 전까지 계속 수정 가능 */
+  }
+
+  /* ══ HISTORY ══ */
+  function renderHistory() {
+    const total  = sessions.length;
+    const avgPct = total > 0 ? Math.round(sessions.reduce((s,h) => s + h.pct, 0) / total) : 0;
+    const totalA = sessions.reduce((s,h) => s + h.totalFilled, 0);
+    const streak = calcStreak();
+
+    document.getElementById('statsCards').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-value">${total}</div>
+        <div class="stat-label">총 연습일</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${avgPct}%</div>
+        <div class="stat-label">평균 달성률</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${streak}일</div>
+        <div class="stat-label">연속 연습</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${totalA}</div>
+        <div class="stat-label">총 사과 수</div>
+      </div>`;
+
+    const el = document.getElementById('sessionList');
+    if (sessions.length === 0) {
+      el.innerHTML = '<div class="empty-history">아직 완료한 기록이 없어요.<br>🍎 Done 버튼을 눌러 오늘 연습을 저장해보세요!</div>';
+      return;
+    }
+    el.innerHTML = '';
+    sessions.forEach((session, idx) => {
+      const songNames = session.rows.filter(r => r.song).map(r => r.song).join('  ·  ') || '(곡명 없음)';
+      const card = document.createElement('div');
+      card.className = 'session-card';
+      const detailRows = session.rows.filter(r => r.song || r.filled > 0).map(r => {
+        const rp = r.appleCount > 0 ? Math.round(r.filled / r.appleCount * 100) : 0;
+        return `<div class="detail-row">
+          <span class="detail-song">${r.song || '(무제)'}</span>
+          <div class="detail-bar-wrap">
+            <div class="detail-bar-bg">
+              <div class="detail-bar-fill" style="width:${rp}%"></div>
+            </div>
+          </div>
+          <span class="detail-pct">${rp}%</span>
+        </div>`;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="session-header">
+          <span class="session-date">${formatDateKo(session.date)}</span>
+          <div style="text-align:right">
+            <div class="session-pct">${session.pct}%</div>
+            <div class="session-count">${session.totalFilled} / ${session.totalApples}개</div>
+          </div>
+        </div>
+        <div class="session-songs">${songNames}</div>
+        <div class="session-bar-bg">
+          <div class="session-bar-fill" style="width:${session.pct}%"></div>
+        </div>
+        <div class="session-detail" id="detail-${idx}">${detailRows}</div>`;
+      card.onclick = () => document.getElementById(`detail-${idx}`).classList.toggle('open');
+      el.appendChild(card);
+    });
+  }
+
+  function calcStreak() {
+    if (sessions.length === 0) return 0;
+    const sorted = [...sessions].sort((a,b) => b.date.localeCompare(a.date));
+    let streak = 1;
+    for (let i = 1; i < sorted.length; i++) {
+      const diff = (new Date(sorted[i-1].date) - new Date(sorted[i].date)) / 86400000;
+      if (Math.round(diff) === 1) streak++;
+      else break;
+    }
+    return streak;
+  }
+
+  /* ══ PERSIST ══ */
+  function saveMain() {
+    localStorage.setItem('practiceMain', JSON.stringify({
+      date: getTodayKey(), appleCount, rows, nextId
+    }));
+  }
+  function saveSessions() {
+    localStorage.setItem('practiceHistory', JSON.stringify(sessions));
+  }
+
+  /* ══ LOAD ══ */
+  function load() {
+    const today = getTodayKey();
+
+    // update badge
+    document.getElementById('todayBadge').textContent = formatDateKo(today);
+
+    // load history first (needed for archiving)
+    try {
+      const raw = localStorage.getItem('practiceHistory');
+      if (raw) sessions = JSON.parse(raw);
+    } catch(e) {}
+
+    // load today's main
+    try {
+      const raw = localStorage.getItem('practiceMain');
+      if (raw) {
+        const d = JSON.parse(raw);
+
+        if (d.date === today) {
+          // same day — restore
+          appleCount = d.appleCount || 10;
+          nextId     = d.nextId     || 1;
+          rows       = d.rows       || [];
+          document.getElementById('appleCountInput').value = appleCount;
+          rows.forEach(renderRow);
+        } else {
+          // new day — auto-archive yesterday if it has data
+          if (d.date && d.rows && d.rows.some(r => r.filled > 0 || r.song)) {
+            const prevDate = d.date;
+            if (!sessions.some(s => s.date === prevDate)) {
+              const totalApples  = d.rows.reduce((s,r) => s + (r.appleCount||20), 0);
+              const filledApples = d.rows.reduce((s,r) => s + r.filled, 0);
+              const pct = totalApples > 0 ? Math.round(filledApples / totalApples * 100) : 0;
+              sessions.unshift({
+                date: prevDate,
+                rows: d.rows.map(r => ({ song: r.song, filled: r.filled, appleCount: r.appleCount })),
+                totalFilled: filledApples, totalApples, pct, savedAt: Date.now()
+              });
+              saveSessions();
+            }
+          }
+        }
+      }
+    } catch(e) {}
+
+    if (rows.length === 0) for (let i = 0; i < 5; i++) addRow();
+  }
+
+  load();
+
+  /* ── Star background ── */
+  (function() {
+    const pts = "0,-7 1.71,-2.35 6.66,-2.16 2.77,0.9 4.11,5.66 0,2.9 -4.11,5.66 -2.77,0.9 -6.66,-2.16 -1.71,-2.35";
+    const pos = [
+      [10,20],[70,20],[130,20],[190,20],
+      [40,60],[100,60],[160,60],
+      [10,100],[70,100],[130,100],[190,100],
+      [40,140],[100,140],[160,140],
+      [10,180],[70,180],[130,180],[190,180],
+    ];
+    const polys = pos.map(([x,y]) =>
+      `<polygon fill="#e8efc8" points="${pts}" transform="translate(${x},${y})"/>`
+    ).join('');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">${polys}</svg>`;
+    document.body.style.backgroundImage = `url("data:image/svg+xml;base64,${btoa(svg)}")`;
+    document.body.style.backgroundSize  = '200px 200px';
+  })();
+</script>
+</body>
+</html>
